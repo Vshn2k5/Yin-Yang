@@ -1,0 +1,958 @@
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string;
+          user_id: string;
+          email: string | null;
+          full_name: string | null;
+          avatar_url: string | null;
+          bio: string | null;
+          location: string | null;
+          website: string | null;
+          role: 'guest' | 'user' | 'premium' | 'admin';
+          is_verified: boolean;
+          preferences: Record<string, unknown>;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          email?: string | null;
+          full_name?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
+          location?: string | null;
+          website?: string | null;
+          role?: 'guest' | 'user' | 'premium' | 'admin';
+          is_verified?: boolean;
+          preferences?: Record<string, unknown>;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          email?: string | null;
+          full_name?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
+          location?: string | null;
+          website?: string | null;
+          role?: 'guest' | 'user' | 'premium' | 'admin';
+          is_verified?: boolean;
+          preferences?: Record<string, unknown>;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      social_links: {
+        Row: {
+          id: string;
+          user_id: string;
+          platform: string;
+          username: string | null;
+          url: string | null;
+          is_verified: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          platform: string;
+          username?: string | null;
+          url?: string | null;
+          is_verified?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          platform?: string;
+          username?: string | null;
+          url?: string | null;
+          is_verified?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      user_sessions: {
+        Row: {
+          id: string;
+          user_id: string;
+          session_token: string | null;
+          ip_address: string | null;
+          user_agent: string | null;
+          is_active: boolean;
+          expires_at: string | null;
+          created_at: string;
+          last_activity: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          session_token?: string | null;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          is_active?: boolean;
+          expires_at?: string | null;
+          created_at?: string;
+          last_activity?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          session_token?: string | null;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          is_active?: boolean;
+          expires_at?: string | null;
+          created_at?: string;
+          last_activity?: string;
+        };
+      };
+      professional_assessments: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          assessment_type: string;
+          assessment_name: string;
+          results: Record<string, unknown>;
+          score: number | null;
+          completed_date: string | null;
+          expires_date: string | null;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          assessment_type: string;
+          assessment_name: string;
+          results: Record<string, unknown>;
+          score?: number | null;
+          completed_date?: string | null;
+          expires_date?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          assessment_type?: string;
+          assessment_name?: string;
+          results?: Record<string, unknown>;
+          score?: number | null;
+          completed_date?: string | null;
+          expires_date?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      career_goals: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          title: string;
+          description: string | null;
+          category: string;
+          priority: string;
+          timeline: string;
+          target_date: string | null;
+          current_status: string;
+          progress_percentage: number;
+          success_metrics: string[] | null;
+          obstacles: string[] | null;
+          resources_needed: string[] | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          title: string;
+          description?: string | null;
+          category?: string;
+          priority?: string;
+          timeline?: string;
+          target_date?: string | null;
+          current_status?: string;
+          progress_percentage?: number;
+          success_metrics?: string[] | null;
+          obstacles?: string[] | null;
+          resources_needed?: string[] | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          title?: string;
+          description?: string | null;
+          category?: string;
+          priority?: string;
+          timeline?: string;
+          target_date?: string | null;
+          current_status?: string;
+          progress_percentage?: number;
+          success_metrics?: string[] | null;
+          obstacles?: string[] | null;
+          resources_needed?: string[] | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      skill_requirements: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          goal_id: string | null;
+          skill_name: string;
+          skill_category: string;
+          current_level: number;
+          target_level: number;
+          importance: string;
+          learning_priority: number;
+          estimated_time_hours: number | null;
+          deadline: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          goal_id?: string | null;
+          skill_name: string;
+          skill_category?: string;
+          current_level?: number;
+          target_level?: number;
+          importance?: string;
+          learning_priority?: number;
+          estimated_time_hours?: number | null;
+          deadline?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          goal_id?: string | null;
+          skill_name?: string;
+          skill_category?: string;
+          current_level?: number;
+          target_level?: number;
+          importance?: string;
+          learning_priority?: number;
+          estimated_time_hours?: number | null;
+          deadline?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      development_actions: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          goal_id: string | null;
+          skill_id: string | null;
+          action_type: string;
+          title: string;
+          description: string | null;
+          specific_steps: string[] | null;
+          estimated_duration: string | null;
+          cost_estimate: number | null;
+          deadline: string | null;
+          status: string;
+          completion_date: string | null;
+          outcome_notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          goal_id?: string | null;
+          skill_id?: string | null;
+          action_type?: string;
+          title: string;
+          description?: string | null;
+          specific_steps?: string[] | null;
+          estimated_duration?: string | null;
+          cost_estimate?: number | null;
+          deadline?: string | null;
+          status?: string;
+          completion_date?: string | null;
+          outcome_notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          goal_id?: string | null;
+          skill_id?: string | null;
+          action_type?: string;
+          title?: string;
+          description?: string | null;
+          specific_steps?: string[] | null;
+          estimated_duration?: string | null;
+          cost_estimate?: number | null;
+          deadline?: string | null;
+          status?: string;
+          completion_date?: string | null;
+          outcome_notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      progress_metrics: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          goal_id: string | null;
+          metric_name: string;
+          metric_type: string;
+          target_value: string;
+          current_value: string | null;
+          measurement_frequency: string;
+          last_measured: string | null;
+          measurement_history: Record<string, unknown>[];
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          goal_id?: string | null;
+          metric_name: string;
+          metric_type?: string;
+          target_value: string;
+          current_value?: string | null;
+          measurement_frequency?: string;
+          last_measured?: string | null;
+          measurement_history?: Record<string, unknown>[];
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          goal_id?: string | null;
+          metric_name?: string;
+          metric_type?: string;
+          target_value?: string;
+          current_value?: string | null;
+          measurement_frequency?: string;
+          last_measured?: string | null;
+          measurement_history?: Record<string, unknown>[];
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      learning_resources: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          skill_id: string | null;
+          resource_type: string;
+          title: string;
+          provider: string | null;
+          url: string | null;
+          cost: number | null;
+          estimated_time_hours: number | null;
+          difficulty_level: string | null;
+          rating: number | null;
+          status: string;
+          completion_date: string | null;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          skill_id?: string | null;
+          resource_type?: string;
+          title: string;
+          provider?: string | null;
+          url?: string | null;
+          cost?: number | null;
+          estimated_time_hours?: number | null;
+          difficulty_level?: string | null;
+          rating?: number | null;
+          status?: string;
+          completion_date?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          skill_id?: string | null;
+          resource_type?: string;
+          title?: string;
+          provider?: string | null;
+          url?: string | null;
+          cost?: number | null;
+          estimated_time_hours?: number | null;
+          difficulty_level?: string | null;
+          rating?: number | null;
+          status?: string;
+          completion_date?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      mentorship_connections: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          mentor_name: string;
+          mentor_title: string | null;
+          mentor_company: string | null;
+          mentor_contact: string | null;
+          relationship_type: string;
+          focus_areas: string[] | null;
+          meeting_frequency: string | null;
+          last_contact: string | null;
+          status: string;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          mentor_name: string;
+          mentor_title?: string | null;
+          mentor_company?: string | null;
+          mentor_contact?: string | null;
+          relationship_type?: string;
+          focus_areas?: string[] | null;
+          meeting_frequency?: string | null;
+          last_contact?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          mentor_name?: string;
+          mentor_title?: string | null;
+          mentor_company?: string | null;
+          mentor_contact?: string | null;
+          relationship_type?: string;
+          focus_areas?: string[] | null;
+          meeting_frequency?: string | null;
+          last_contact?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      certifications: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          skill_id: string | null;
+          certification_name: string;
+          issuing_organization: string;
+          certification_type: string;
+          status: string;
+          study_start_date: string | null;
+          exam_date: string | null;
+          completion_date: string | null;
+          expiration_date: string | null;
+          cost: number | null;
+          study_hours_estimated: number | null;
+          study_hours_actual: number | null;
+          score: string | null;
+          certificate_url: string | null;
+          renewal_required: boolean | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          skill_id?: string | null;
+          certification_name: string;
+          issuing_organization: string;
+          certification_type?: string;
+          status?: string;
+          study_start_date?: string | null;
+          exam_date?: string | null;
+          completion_date?: string | null;
+          expiration_date?: string | null;
+          cost?: number | null;
+          study_hours_estimated?: number | null;
+          study_hours_actual?: number | null;
+          score?: string | null;
+          certificate_url?: string | null;
+          renewal_required?: boolean | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          skill_id?: string | null;
+          certification_name?: string;
+          issuing_organization?: string;
+          certification_type?: string;
+          status?: string;
+          study_start_date?: string | null;
+          exam_date?: string | null;
+          completion_date?: string | null;
+          expiration_date?: string | null;
+          cost?: number | null;
+          study_hours_estimated?: number | null;
+          study_hours_actual?: number | null;
+          score?: string | null;
+          certificate_url?: string | null;
+          renewal_required?: boolean | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      industry_events: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          event_name: string;
+          event_type: string;
+          organizer: string | null;
+          event_date: string | null;
+          location: string | null;
+          virtual: boolean | null;
+          cost: number | null;
+          registration_deadline: string | null;
+          status: string;
+          networking_goals: string[] | null;
+          key_takeaways: string | null;
+          connections_made: string[] | null;
+          follow_up_actions: string[] | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          event_name: string;
+          event_type?: string;
+          organizer?: string | null;
+          event_date?: string | null;
+          location?: string | null;
+          virtual?: boolean | null;
+          cost?: number | null;
+          registration_deadline?: string | null;
+          status?: string;
+          networking_goals?: string[] | null;
+          key_takeaways?: string | null;
+          connections_made?: string[] | null;
+          follow_up_actions?: string[] | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          event_name?: string;
+          event_type?: string;
+          organizer?: string | null;
+          event_date?: string | null;
+          location?: string | null;
+          virtual?: boolean | null;
+          cost?: number | null;
+          registration_deadline?: string | null;
+          status?: string;
+          networking_goals?: string[] | null;
+          key_takeaways?: string | null;
+          connections_made?: string[] | null;
+          follow_up_actions?: string[] | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      skill_projects: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          skill_id: string | null;
+          project_name: string;
+          project_type: string;
+          description: string | null;
+          objectives: string[] | null;
+          technologies_used: string[] | null;
+          start_date: string | null;
+          target_completion_date: string | null;
+          actual_completion_date: string | null;
+          status: string;
+          progress_percentage: number | null;
+          repository_url: string | null;
+          demo_url: string | null;
+          lessons_learned: string | null;
+          skills_gained: string[] | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          skill_id?: string | null;
+          project_name: string;
+          project_type?: string;
+          description?: string | null;
+          objectives?: string[] | null;
+          technologies_used?: string[] | null;
+          start_date?: string | null;
+          target_completion_date?: string | null;
+          actual_completion_date?: string | null;
+          status?: string;
+          progress_percentage?: number | null;
+          repository_url?: string | null;
+          demo_url?: string | null;
+          lessons_learned?: string | null;
+          skills_gained?: string[] | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          skill_id?: string | null;
+          project_name?: string;
+          project_type?: string;
+          description?: string | null;
+          objectives?: string[] | null;
+          technologies_used?: string[] | null;
+          start_date?: string | null;
+          target_completion_date?: string | null;
+          actual_completion_date?: string | null;
+          status?: string;
+          progress_percentage?: number | null;
+          repository_url?: string | null;
+          demo_url?: string | null;
+          lessons_learned?: string | null;
+          skills_gained?: string[] | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      // ─── Gamification Tables ─────────────────────────────────
+      quest_templates: {
+        Row: {
+          id: string;
+          template_key: string;
+          title: string;
+          description: string;
+          domain: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          difficulty: 'Easy' | 'Medium' | 'Hard';
+          quest_type: 'daily' | 'weekly' | 'monthly' | 'chain';
+          base_xp_reward: number;
+          base_coin_reward: number;
+          completion_criteria: string[];
+          is_active: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          template_key: string;
+          title: string;
+          description: string;
+          domain: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          difficulty: 'Easy' | 'Medium' | 'Hard';
+          quest_type: 'daily' | 'weekly' | 'monthly' | 'chain';
+          base_xp_reward?: number;
+          base_coin_reward?: number;
+          completion_criteria?: string[];
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          template_key?: string;
+          title?: string;
+          description?: string;
+          domain?: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          difficulty?: 'Easy' | 'Medium' | 'Hard';
+          quest_type?: 'daily' | 'weekly' | 'monthly' | 'chain';
+          base_xp_reward?: number;
+          base_coin_reward?: number;
+          completion_criteria?: string[];
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      user_stats: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          rank: 'E' | 'D' | 'C' | 'B' | 'A' | 'S' | 'SS' | 'SSS';
+          level: number;
+          total_xp: number;
+          coins: number;
+          coin_earning_penalty: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title?: string;
+          rank?: 'E' | 'D' | 'C' | 'B' | 'A' | 'S' | 'SS' | 'SSS';
+          level?: number;
+          total_xp?: number;
+          coins?: number;
+          coin_earning_penalty?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          rank?: 'E' | 'D' | 'C' | 'B' | 'A' | 'S' | 'SS' | 'SSS';
+          level?: number;
+          total_xp?: number;
+          coins?: number;
+          coin_earning_penalty?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      user_skills: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          domain: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          level: number;
+          xp: number;
+          xp_to_next_level: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          domain: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          level?: number;
+          xp?: number;
+          xp_to_next_level?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          domain?: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          level?: number;
+          xp?: number;
+          xp_to_next_level?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      user_quests: {
+        Row: {
+          id: string;
+          user_id: string;
+          quest_id: string;
+          title: string;
+          domain: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          status: 'active' | 'completed' | 'failed' | 'expired';
+          xp_reward: number;
+          coin_reward: number;
+          completed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          quest_id: string;
+          title: string;
+          domain: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          status?: 'active' | 'completed' | 'failed' | 'expired';
+          xp_reward: number;
+          coin_reward: number;
+          completed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          quest_id?: string;
+          title?: string;
+          domain?: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+          status?: 'active' | 'completed' | 'failed' | 'expired';
+          xp_reward?: number;
+          coin_reward?: number;
+          completed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      user_inventory: {
+        Row: {
+          id: string;
+          user_id: string;
+          item_id: string;
+          item_name: string;
+          item_type: string;
+          is_active: boolean;
+          expires_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          item_id: string;
+          item_name: string;
+          item_type: string;
+          is_active?: boolean;
+          expires_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          item_id?: string;
+          item_name?: string;
+          item_type?: string;
+          is_active?: boolean;
+          expires_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      user_streaks: {
+        Row: {
+          id: string;
+          user_id: string;
+          current_streak: number;
+          longest_streak: number;
+          last_updated: string;
+          freeze_active: boolean;
+          freeze_expires_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          current_streak?: number;
+          longest_streak?: number;
+          last_updated?: string;
+          freeze_active?: boolean;
+          freeze_expires_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          current_streak?: number;
+          longest_streak?: number;
+          last_updated?: string;
+          freeze_active?: boolean;
+          freeze_expires_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      user_achievements: {
+        Row: {
+          id: string;
+          user_id: string;
+          achievement_id: string;
+          title: string;
+          unlocked_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          achievement_id: string;
+          title: string;
+          unlocked_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          achievement_id?: string;
+          title?: string;
+          unlocked_at?: string;
+          created_at?: string;
+        };
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      complete_quest: {
+        Args: {
+          p_user_id: string;
+          p_quest_id: string;
+          p_title: string;
+          p_domain: string;
+          p_xp_reward: number;
+          p_coin_reward: number;
+        };
+        Returns: {
+          success: boolean;
+          message?: string;
+          coins_earned?: number;
+          xp_earned?: number;
+        };
+      };
+      purchase_item: {
+        Args: {
+          p_user_id: string;
+          p_item_id: string;
+          p_item_name: string;
+          p_item_type: string;
+          p_price: number;
+        };
+        Returns: {
+          success: boolean;
+          message?: string;
+          remaining_coins?: number;
+        };
+      };
+    };
+    Enums: {
+      user_role: 'guest' | 'user' | 'premium' | 'admin';
+      quest_status: 'active' | 'completed' | 'failed' | 'expired';
+      domain_type: 'Physical' | 'Mental' | 'Technical' | 'Creative';
+      rank_type: 'E' | 'D' | 'C' | 'B' | 'A' | 'S' | 'SS' | 'SSS';
+    };
+  };
+}
