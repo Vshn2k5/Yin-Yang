@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { User, Session } from '@supabase/supabase-js';
+import { validate, signUpSchema, signInSchema, resetPasswordSchema, updatePasswordSchema, checkRateLimit } from './validation';
 
 export type OAuthProvider = 'google' | 'github' | 'facebook' | 'twitter';
 
@@ -45,6 +46,21 @@ export interface AuthState {
 export const authAPI = {
   // Sign up with email and password
   async signUp(email: string, password: string, metadata?: Record<string, unknown>) {
+    // Validate input
+    const validation = validate(signUpSchema, { email, password, ...metadata });
+    if (!validation.success) {
+      return { data: null, error: new Error(validation.error) };
+    }
+
+    // Check rate limit
+    const rateLimit = checkRateLimit(`signup:${email}`, 3, 60000); // 3 attempts per minute
+    if (!rateLimit.allowed) {
+      return { 
+        data: null, 
+        error: new Error(`Too many attempts. Please try again in ${rateLimit.retryAfter} seconds.`) 
+      };
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -57,6 +73,21 @@ export const authAPI = {
 
   // Sign in with email and password
   async signIn(email: string, password: string) {
+    // Validate input
+    const validation = validate(signInSchema, { email, password });
+    if (!validation.success) {
+      return { data: null, error: new Error(validation.error) };
+    }
+
+    // Check rate limit
+    const rateLimit = checkRateLimit(`signin:${email}`, 5, 60000); // 5 attempts per minute
+    if (!rateLimit.allowed) {
+      return { 
+        data: null, 
+        error: new Error(`Too many attempts. Please try again in ${rateLimit.retryAfter} seconds.`) 
+      };
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -89,6 +120,12 @@ export const authAPI = {
 
   // Reset password
   async resetPassword(email: string) {
+    // Validate input
+    const validation = validate(resetPasswordSchema, { email });
+    if (!validation.success) {
+      return { data: null, error: new Error(validation.error) };
+    }
+
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`
     });
@@ -97,6 +134,12 @@ export const authAPI = {
 
   // Update password
   async updatePassword(password: string) {
+    // Validate input
+    const validation = validate(updatePasswordSchema, { password });
+    if (!validation.success) {
+      return { data: null, error: new Error(validation.error) };
+    }
+
     const { data, error } = await supabase.auth.updateUser({
       password
     });
@@ -280,9 +323,17 @@ export const securityAPI = {
   }
 };
 
-// Auth state listener
+// Auth state listener with race condition protection
+let authAbortController: AbortController | null = null;
+
 export const setupAuthListener = (callback: (authState: AuthState) => void) => {
   return supabase.auth.onAuthStateChange(async (_event, session) => {
+    // Cancel any pending auth operations to prevent race conditions
+    if (authAbortController) {
+      authAbortController.abort();
+    }
+    authAbortController = new AbortController();
+
     const authState: AuthState = {
       user: null,
       session,
@@ -291,54 +342,62 @@ export const setupAuthListener = (callback: (authState: AuthState) => void) => {
     };
 
     if (session?.user) {
-      // Get user profile
-      let { data: profile } = await profileAPI.getProfile(session.user.id);
-      
-      // If no profile exists, auto-create one (handles users who pre-date the
-      // handle_new_user trigger or cases where the trigger failed)
-      if (!profile) {
-        try {
-          const { data: newProfile } = await supabase
-            .from('profiles')
-            .insert({
-              user_id: session.user.id,
-              email: session.user.email,
-              full_name: session.user.user_metadata?.full_name
-                || session.user.user_metadata?.name
-                || session.user.email?.split('@')[0]
-                || 'User',
-              avatar_url: session.user.user_metadata?.avatar_url || null,
-              role: 'user'
-            })
-            .select()
-            .single();
-          
-          if (newProfile) {
-            profile = newProfile;
+      try {
+        // Get user profile
+        let { data: profile } = await profileAPI.getProfile(session.user.id);
+        
+        // If no profile exists, auto-create one (handles users who pre-date the
+        // handle_new_user trigger or cases where the trigger failed)
+        if (!profile) {
+          try {
+            const { data: newProfile } = await supabase
+              .from('profiles')
+              .insert({
+                user_id: session.user.id,
+                email: session.user.email,
+                full_name: session.user.user_metadata?.full_name
+                  || session.user.user_metadata?.name
+                  || session.user.email?.split('@')[0]
+                  || 'User',
+                avatar_url: session.user.user_metadata?.avatar_url || null,
+                role: 'user'
+              })
+              .select()
+              .single();
+            
+            if (newProfile) {
+              profile = newProfile;
+            }
+          } catch (insertError) {
+            console.warn('Could not auto-create profile:', insertError);
           }
-        } catch (insertError) {
-          console.warn('Could not auto-create profile:', insertError);
         }
-      }
 
-      // Ensure we always have at least a minimal profile for authenticated users
-      authState.user = {
-        ...session.user,
-        profile: profile || {
-          id: session.user.id,
-          user_id: session.user.id,
-          email: session.user.email,
-          full_name: session.user.user_metadata?.full_name
-            || session.user.user_metadata?.name
-            || session.user.email?.split('@')[0]
-            || 'User',
-          role: 'user' as const,
-          is_verified: false,
-          preferences: {},
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+        // Ensure we always have at least a minimal profile for authenticated users
+        authState.user = {
+          ...session.user,
+          profile: profile || {
+            id: session.user.id,
+            user_id: session.user.id,
+            email: session.user.email,
+            full_name: session.user.user_metadata?.full_name
+              || session.user.user_metadata?.name
+              || session.user.email?.split('@')[0]
+              || 'User',
+            role: 'user' as const,
+            is_verified: false,
+            preferences: {},
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        };
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Request was aborted due to race condition, ignore
+          return;
         }
-      };
+        console.error('Error in auth state change:', error);
+      }
     }
 
     callback(authState);

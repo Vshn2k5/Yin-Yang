@@ -6,7 +6,26 @@ interface ScrollPosition {
   y: number;
 }
 
+// LRU cache for scroll positions to prevent memory leaks
+const MAX_STORED_POSITIONS = 50;
 const scrollPositions = new Map<string, ScrollPosition>();
+
+function addScrollPosition(key: string, position: ScrollPosition): void {
+  // If key exists, delete it first to update its position in the LRU order
+  if (scrollPositions.has(key)) {
+    scrollPositions.delete(key);
+  }
+  
+  // If at capacity, remove the oldest entry
+  if (scrollPositions.size >= MAX_STORED_POSITIONS) {
+    const firstKey = scrollPositions.keys().next().value;
+    if (firstKey) {
+      scrollPositions.delete(firstKey);
+    }
+  }
+  
+  scrollPositions.set(key, position);
+}
 
 export const useScrollPosition = () => {
   const location = useLocation();
@@ -15,7 +34,7 @@ export const useScrollPosition = () => {
   // Save scroll position when leaving a page
   useEffect(() => {
     const saveScrollPosition = () => {
-      scrollPositions.set(location.pathname, {
+      addScrollPosition(location.pathname, {
         x: window.scrollX,
         y: window.scrollY
       });
