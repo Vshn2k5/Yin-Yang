@@ -1,8 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { isSameDay, startOfDay } from 'date-fns';
 import Layout from '../components/Layout';
 import AnimatedCard from '../components/AnimatedCard';
+import ParticleBackground from '../components/ParticleBackground';
+import GlowingButton from '../components/GlowingButton';
+import PowerUpEffect from '../components/PowerUpEffect';
 import { useProdigyStore } from '../store';
 import ProgressBar from '../components/ProgressBar';
 import EnhancedQuestCard from '../components/EnhancedQuestCard';
@@ -10,11 +13,13 @@ import SkillCard from '../components/SkillCard';
 import StreakCounter from '../components/StreakCounter';
 import ProgressRings from '../components/ProgressRings';
 import RadialProgressChart from '../components/RadialProgressChart';
-import { Award, Zap, Coins, Clock, Target } from 'lucide-react';
+import { Award, Zap, Coins, Clock, Target, Sparkles, TrendingUp, Flame } from 'lucide-react';
 import type { Domain } from '../types';
 
 const Dashboard: React.FC = () => {
   const didInitRef = useRef(false);
+  const [showPowerUp, setShowPowerUp] = useState(false);
+  const [hoveredStat, setHoveredStat] = useState<string | null>(null);
   const { 
     user, 
     skills, 
@@ -26,6 +31,15 @@ const Dashboard: React.FC = () => {
     initializeShop,
     isAuthenticated
   } = useProdigyStore();
+  
+  // Trigger power-up effect on rank up or milestone
+  useEffect(() => {
+    if (user.rank === 'S' || user.rank === 'SS' || user.rank === 'SSS') {
+      setShowPowerUp(true);
+      const timer = setTimeout(() => setShowPowerUp(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [user.rank]);
   
   // Initialize with sample data if empty
   useEffect(() => {
@@ -147,32 +161,75 @@ const Dashboard: React.FC = () => {
   
   return (
     <Layout currentPage="dashboard">
+      {/* Animated particle background */}
+      <ParticleBackground particleCount={20} speed="slow" />
+      
+      {/* Power-up celebration effect */}
+      <AnimatePresence>
+        {showPowerUp && (
+          <PowerUpEffect type="star" duration={2000} />
+        )}
+      </AnimatePresence>
+      
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="mb-6"
+        className="mb-6 relative z-10"
       >
-        <h1 className="text-2xl font-['Orbitron'] font-bold mb-1">HUNTER DASHBOARD</h1>
-        <p className="text-gray-400">Your journey to mastery continues, Hunter.</p>
+        <div className="flex items-center gap-3 mb-2">
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles className="w-8 h-8 text-indigo-400" />
+          </motion.div>
+          <h1 className="text-3xl font-['Orbitron'] font-bold magical-text text-glow">
+            HUNTER DASHBOARD
+          </h1>
+        </div>
+        <p className="text-gray-400 flex items-center gap-2">
+          <Flame className="w-4 h-4 text-orange-400" />
+          Your journey to mastery continues, Hunter.
+        </p>
       </motion.div>
       
-      {/* Enhanced Stats Overview */}
+      {/* Enhanced Stats Overview with interactive effects */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, staggerChildren: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 relative z-10"
       >
-        <AnimatedCard delay={0.1} className="bg-gray-800 rounded-lg p-4 border border-indigo-900">
-          <div className="flex items-center mb-2">
-            <Award className="w-5 h-5 text-indigo-400 mr-2" />
+        <AnimatedCard 
+          delay={0.1} 
+          className="bg-gray-800 rounded-lg p-4 border border-indigo-900 cursor-pointer energy-aura"
+          onMouseEnter={() => setHoveredStat('rank')}
+          onMouseLeave={() => setHoveredStat(null)}
+        >
+          <motion.div 
+            className="flex items-center mb-2"
+            animate={hoveredStat === 'rank' ? { scale: 1.05 } : {}}
+          >
+            <motion.div
+              animate={{ 
+                rotate: hoveredStat === 'rank' ? [0, 360] : 0,
+                scale: hoveredStat === 'rank' ? 1.2 : 1
+              }}
+              transition={{ duration: 0.5 }}
+            >
+              <Award className="w-5 h-5 text-indigo-400 mr-2" />
+            </motion.div>
             <h3 className="font-semibold">Current Rank</h3>
-          </div>
+          </motion.div>
           <div className="flex items-center">
-            <div className="w-12 h-12 rounded-full bg-indigo-900 flex items-center justify-center mr-3 glow">
+            <motion.div 
+              className="w-12 h-12 rounded-full bg-indigo-900 flex items-center justify-center mr-3 glow"
+              whileHover={{ scale: 1.1, boxShadow: '0 0 30px rgba(99, 102, 241, 0.8)' }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <span className="font-bold text-xl">{user.rank}</span>
-            </div>
+            </motion.div>
             <div>
               <div className="text-sm text-gray-400">Level {user.level}</div>
               <div className="text-sm text-gray-400">Next: {nextRank}</div>
@@ -184,40 +241,84 @@ const Dashboard: React.FC = () => {
               />
             </div>
           </div>
+          {hoveredStat === 'rank' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 text-xs text-indigo-300"
+            >
+              <TrendingUp className="w-3 h-3 inline mr-1" />
+              Keep grinding for {nextRank} rank!
+            </motion.div>
+          )}
         </AnimatedCard>
         
-        <AnimatedCard delay={0.2} className="bg-gray-800 rounded-lg p-4 border border-yellow-900">
-          <div className="flex items-center mb-2">
+        <AnimatedCard 
+          delay={0.2} 
+          className="bg-gray-800 rounded-lg p-4 border border-yellow-900 cursor-pointer energy-aura"
+          onMouseEnter={() => setHoveredStat('coins')}
+          onMouseLeave={() => setHoveredStat(null)}
+        >
+          <motion.div 
+            className="flex items-center mb-2"
+            animate={hoveredStat === 'coins' ? { scale: 1.05 } : {}}
+          >
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              animate={{ 
+                rotate: hoveredStat === 'coins' ? 360 : 0,
+                scale: hoveredStat === 'coins' ? 1.2 : 1
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             >
               <Coins className="w-5 h-5 text-yellow-400 mr-2" />
             </motion.div>
             <h3 className="font-semibold">Coin Balance</h3>
-          </div>
-          <div className="flex items-center">
-            <div className="text-2xl font-bold text-yellow-400">{(user.coins || 0).toLocaleString()}</div>
+          </motion.div>
+          <motion.div 
+            className="flex items-center"
+            animate={hoveredStat === 'coins' ? { scale: 1.02 } : {}}
+          >
+            <div className="text-2xl font-bold text-yellow-400 text-glow">
+              {(user.coins || 0).toLocaleString()}
+            </div>
             <div className="text-sm text-gray-400 ml-2">coins</div>
-          </div>
+          </motion.div>
           <div className="text-xs text-gray-500 mt-2">
             {(user.activeBoosts || []).length > 0 && (
-              <span className="text-green-400">Boosts active!</span>
+              <motion.span 
+                className="text-green-400 flex items-center gap-1"
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Zap className="w-3 h-3" />
+                Boosts active!
+              </motion.span>
             )}
           </div>
         </AnimatedCard>
         
-        <AnimatedCard delay={0.3} className="bg-gray-800 rounded-lg p-4 border border-green-900">
-          <div className="flex items-center mb-2">
+        <AnimatedCard 
+          delay={0.3} 
+          className="bg-gray-800 rounded-lg p-4 border border-green-900 cursor-pointer energy-aura"
+          onMouseEnter={() => setHoveredStat('daily')}
+          onMouseLeave={() => setHoveredStat(null)}
+        >
+          <motion.div 
+            className="flex items-center mb-2"
+            animate={hoveredStat === 'daily' ? { scale: 1.05 } : {}}
+          >
             <Target className="w-5 h-5 text-green-400 mr-2" />
             <h3 className="font-semibold">Daily Progress</h3>
-          </div>
-          <div className="flex items-center">
-            <div className="text-2xl font-bold text-green-400">
+          </motion.div>
+          <motion.div 
+            className="flex items-center"
+            animate={hoveredStat === 'daily' ? { scale: 1.02 } : {}}
+          >
+            <div className="text-2xl font-bold text-green-400 text-glow">
               {user.progressRings.daily.current}/{user.progressRings.daily.target}
             </div>
             <div className="text-sm text-gray-400 ml-2">quests</div>
-          </div>
+          </motion.div>
           <ProgressBar 
             current={user.progressRings.daily.current} 
             max={user.progressRings.daily.target} 
@@ -225,21 +326,50 @@ const Dashboard: React.FC = () => {
             showText={false}
             height={4}
           />
+          {hoveredStat === 'daily' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 text-xs text-green-300"
+            >
+              Complete more quests for bonus rewards!
+            </motion.div>
+          )}
         </AnimatedCard>
         
-        <AnimatedCard delay={0.4} className="bg-gray-800 rounded-lg p-4 border border-blue-900">
-          <div className="flex items-center mb-2">
+        <AnimatedCard 
+          delay={0.4} 
+          className="bg-gray-800 rounded-lg p-4 border border-blue-900 cursor-pointer energy-aura"
+          onMouseEnter={() => setHoveredStat('reset')}
+          onMouseLeave={() => setHoveredStat(null)}
+        >
+          <motion.div 
+            className="flex items-center mb-2"
+            animate={hoveredStat === 'reset' ? { scale: 1.05 } : {}}
+          >
             <Clock className="w-5 h-5 text-blue-400 mr-2" />
             <h3 className="font-semibold">Quest Reset</h3>
-          </div>
-          <div className="flex items-center">
-            <div className="text-lg font-bold text-blue-400">
+          </motion.div>
+          <motion.div 
+            className="flex items-center"
+            animate={hoveredStat === 'reset' ? { scale: 1.02 } : {}}
+          >
+            <div className="text-lg font-bold text-blue-400 text-glow">
               {hoursUntilReset}h {minutesUntilReset}m
             </div>
-          </div>
+          </motion.div>
           <div className="text-xs text-gray-500 mt-2">
             Until new daily quests
           </div>
+          {hoveredStat === 'reset' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 text-xs text-blue-300"
+            >
+              Fresh quests incoming!
+            </motion.div>
+          )}
         </AnimatedCard>
       </motion.div>
 

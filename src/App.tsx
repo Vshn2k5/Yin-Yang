@@ -6,6 +6,7 @@ import PageTransition from './components/PageTransition';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
+import { AmbientParticles, GradientOrbs } from './components/effects/AmbientEffects';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
