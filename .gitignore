@@ -2,61 +2,73 @@
 # Dependencies
 node_modules/
 
-# Build outputs
-dist/
-build/
-target/
+# Environment variables
+.env.local
+.env.*
 
 # Logs
 *.log
 
-# Environment variables
-.env
-.env.local
-*.env.*
-
-# IDE specific
+# Editor/IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
+*.tmp
 
-# Python specific
+# Python cache (if present)
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-*.so
-*.egg-info/
-.eggs/
 
-# Temporary files
-*.tmp
-*~
-.DS_Store
-Thumbs.db
+# Build outputs (if present)
+dist/
+build/
+target/
+*.o
+*.obj
+*.out
 
-# Coverage reports
+# Compression files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# Coverage reports (if present)
 coverage/
 htmlcov/
 .coverage
 
-# Testing
+# Testing cache (if present)
 .mypy_cache/
 .pytest_cache/
-.nyc_output/
 
-# Package manager
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# Gradle (if present)
+.gradle/
 
-# Runtime
-npm-debug.log*
-yarn-error.log*
+# Julia (if present)
+julia-*/
 
-# System
-.DS_Store
-Thumbs.db
+# Zig (if present)
+zig*/
 ```

@@ -15,6 +15,23 @@ export type ProdigyState = AuthSlice & UserSlice & QuestSlice & SkillSlice & {
   unlockAchievement: (id: string, userId?: string) => void;
 };
 
+// Debounced localStorage save to prevent excessive writes
+let saveTimeout: NodeJS.Timeout | null = null;
+const DEBOUNCE_MS = 300;
+
+const debouncedSave = (data: Partial<ProdigyState>) => {
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+  }
+  saveTimeout = setTimeout(() => {
+    try {
+      localStorage.setItem('prodigy-protocol-storage', JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error);
+    }
+  }, DEBOUNCE_MS);
+};
+
 export const useProdigyStore = create<ProdigyState>()(
   persist(
     (set, get, api) => ({
@@ -88,7 +105,17 @@ export const useProdigyStore = create<ProdigyState>()(
       name: 'prodigy-protocol-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state: ProdigyState) => ({
-        user: state.user,
+        // Only persist essential data to reduce localStorage size
+        user: {
+          coins: state.user.coins,
+          streak: state.user.streak,
+          ownedItems: state.user.ownedItems,
+          penalties: state.user.penalties,
+          activeBoosts: state.user.activeBoosts,
+          lastActive: state.user.lastActive,
+          rank: state.user.rank,
+          progressRings: state.user.progressRings
+        },
         skills: state.skills,
         quests: state.quests,
         shopItems: state.shopItems,

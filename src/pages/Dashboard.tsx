@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { isSameDay, startOfDay } from 'date-fns';
 import Layout from '../components/Layout';
 import AnimatedCard from '../components/AnimatedCard';
 import { useProdigyStore } from '../store';
@@ -76,14 +77,14 @@ const Dashboard: React.FC = () => {
       });
     }
     
-    // Update streak if it's a new day
-    const today = new Date().toDateString();
-    const lastActive = new Date(user.lastActive).toDateString();
+    // Update streak if it's a new day (timezone-safe)
+    const today = startOfDay(new Date());
+    const lastActiveDate = startOfDay(new Date(user.lastActive));
     
-    if (today !== lastActive) {
-      const yesterday = new Date();
+    if (!isSameDay(today, lastActiveDate)) {
+      const yesterday = startOfDay(new Date());
       yesterday.setDate(yesterday.getDate() - 1);
-      const wasYesterday = yesterday.toDateString() === lastActive;
+      const wasYesterday = isSameDay(yesterday, lastActiveDate);
       
       updateUser({
         lastActive: new Date(),
